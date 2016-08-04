@@ -1,7 +1,7 @@
 # Личный проект «Код и Магия» [![Build status][travis-image]][travis-url] [![Dependency status][dependency-image]][dependency-url]
 
 * Студент: [Игорь Яруткин](https://up.htmlacademy.ru/javascript/6/user/145716).
-* Наставник: `Неизвестно`.
+* Наставник: `Без наставника`.
 
 ---
 
