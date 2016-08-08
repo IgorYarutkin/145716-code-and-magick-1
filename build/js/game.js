@@ -394,19 +394,68 @@ window.Game = (function() {
     /**
      * Отрисовка экрана паузы.
      */
+
+/**
+*** Алгоритм отрисовки сообщения
+1. Определяются координаты головы Мага. На основании этого определяется в какую сторону будет отрисовано сообщение
+2. Определяются размеры поля и отрисовывается белое поле для сообщения и тень под ним
+3. Текст сообщения делится на отдельные строки
+4. Выводится сообщение
+***/
+
+    _drawMessage: function(text) {
+      var FONT_SIZE = 16; // размер шрифта в px
+      var FONT_NAME = 'PT Mono'; // название шрифта
+      var LINE_WIDTH = 200; // длина строки
+      var MARGIN = 10;  // маргины
+      var LUG = 20;
+      var INTERLINE = 5;  // рассстояние между строчками
+      var WIDTH_ME = 70;  // ширина объекта Маг
+
+      // получаем объект Маг
+      var me = this.state.objects.filter(function(object) {
+        return object.type === ObjectType.ME;
+      })[0];
+
+      // функция отрисовки поля сообщения
+      var drawField = function(startX, startY, that) {
+        var X1 = startX + WIDTH_ME;
+        var Y1 = startY;
+        var X2 = X1 + LUG;
+        var Y2 = Y1 - 100 - LUG;
+        var X3 = X2 + LINE_WIDTH;
+        var Y3 = Y2;
+        var X4 = X3;
+        var Y4 = Y1 - LUG;
+        that.ctx.moveTo(X1, Y1);
+        that.ctx.lineTo(X2, Y2);
+        that.ctx.lineTo(X3, Y3);
+        that.ctx.lineTo(X4, Y4);
+        that.ctx.lineTo(X1, Y1);
+        that.ctx.closePath();
+        that.ctx.fillStyle = '#fff';
+        that.ctx.fill();
+      };
+
+      drawField(me.x, me.y, this);
+
+
+
+    },
+
     _drawPauseScreen: function() {
       switch (this.state.currentStatus) {
         case Verdict.WIN:
-          console.log('you have won!');
+          this._drawMessage('Ты победил! Поиграем снова?');
           break;
         case Verdict.FAIL:
-          console.log('you have failed!');
+          this._drawMessage('Ты проиграл! Попробуй еще раз!');
           break;
         case Verdict.PAUSE:
-          console.log('game is on pause!');
+          this._drawMessage('Игра поставлена на паузу');
           break;
         case Verdict.INTRO:
-          console.log('welcome to the game! Press Space to start');
+          this._drawMessage('Я умею ходить и летать по нажатию на стрелочки. А если нажать SHIFT, то я выстрелю файерболом');
           break;
       }
     },
