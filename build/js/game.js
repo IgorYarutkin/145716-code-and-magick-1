@@ -409,7 +409,6 @@ window.Game = (function() {
       // var TEXT_HEIGHT = 100;  // высота текста
       var FONT_SIZE = 16; // размер шрифта в px
       var FONT_NAME = 'PT Mono'; // название шрифта
-      var MARGIN = 10;  // маргины
       var LUG = 20;
       var INTERLINE = 5;  // рассстояние между строчками
       var WIDTH_ME = 70;  // ширина объекта Маг
@@ -420,17 +419,19 @@ window.Game = (function() {
       })[0];
 
       // формирование блока сообщения и определение его размеров
+      this.ctx.font = FONT_SIZE + 'px ' + FONT_NAME;
       var words = text.split(' ');
       var lines = [];
       var numberOfLine = 0;
-      words.forEach(function(element) {
-        if (this.ctx.measureText(lines[numberOfLine] + element).width < TEXT_WIDTH) {
-          lines[numberOfLine] = typeof lines[numberOfLine] === 'undefined' ? element + ' ' : lines[numberOfLine] + element + ' ';
+      words.forEach(function(word) {
+        if (this.ctx.measureText(lines[numberOfLine] + word).width < TEXT_WIDTH) {
+          lines[numberOfLine] = (lines[numberOfLine] || '') + word + ' ';
         } else {
           numberOfLine++;
-          lines[numberOfLine] = element + ' ';
+          lines.push(word + ' ');
         }
       }, this);
+      // lines[numberOfLine] = (lines[numberOfLine] || '') + word + ' ';
       // Определение высоты блока
       var TEXT_HEIGHT = (FONT_SIZE + INTERLINE) * lines.length;
 
@@ -464,8 +465,8 @@ window.Game = (function() {
         y3 = y2;
         x4 = x3;
         y4 = y1 - LUG;
-        var xText = x3 + PADDING;
-        var yText = y3 + FONT_SIZE;
+        xText = x3 + PADDING;
+        yText = y3 + FONT_SIZE;
       } else if (me.x < LUG + 2 * PADDING + TEXT_WIDTH && me.y < LUG + 2 * PADDING + TEXT_HEIGHT) {
         // вариант "2"
         x1 = me.x + WIDTH_ME;
@@ -476,8 +477,8 @@ window.Game = (function() {
         y3 = y2;
         x4 = x3;
         y4 = y1 + LUG;
-        var xText = x2 + PADDING;
-        var yText = y4 + FONT_SIZE;
+        xText = x2 + PADDING;
+        yText = y4 + FONT_SIZE;
       } else if (me.x > LUG + 2 * PADDING + TEXT_WIDTH && me.y < LUG + 2 * PADDING + TEXT_HEIGHT) {
         // вариант "3"
         x1 = me.x;
@@ -488,8 +489,8 @@ window.Game = (function() {
         y3 = y2;
         x4 = x3;
         y4 = y1 + LUG;
-        var xText = x4 + PADDING;
-        var yText = y4 + FONT_SIZE;
+        xText = x4 + PADDING;
+        yText = y4 + FONT_SIZE;
       }
 
       this.ctx.moveTo(x1, y1);
