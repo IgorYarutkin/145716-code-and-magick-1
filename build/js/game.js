@@ -404,9 +404,11 @@ window.Game = (function() {
 ***/
 
     _drawMessage: function(text) {
+      var PADDING = 10;
+      var TEXT_WIDTH = 200; // длина текста
+      // var TEXT_HEIGHT = 100;  // высота текста
       var FONT_SIZE = 16; // размер шрифта в px
       var FONT_NAME = 'PT Mono'; // название шрифта
-      var LINE_WIDTH = 200; // длина строки
       var MARGIN = 10;  // маргины
       var LUG = 20;
       var INTERLINE = 5;  // рассстояние между строчками
@@ -417,29 +419,97 @@ window.Game = (function() {
         return object.type === ObjectType.ME;
       })[0];
 
-      // функция отрисовки поля сообщения
-      var drawField = function(startX, startY, that) {
-        var X1 = startX + WIDTH_ME;
-        var Y1 = startY;
-        var X2 = X1 + LUG;
-        var Y2 = Y1 - 100 - LUG;
-        var X3 = X2 + LINE_WIDTH;
-        var Y3 = Y2;
-        var X4 = X3;
-        var Y4 = Y1 - LUG;
-        that.ctx.moveTo(X1, Y1);
-        that.ctx.lineTo(X2, Y2);
-        that.ctx.lineTo(X3, Y3);
-        that.ctx.lineTo(X4, Y4);
-        that.ctx.lineTo(X1, Y1);
-        that.ctx.closePath();
-        that.ctx.fillStyle = '#fff';
-        that.ctx.fill();
-      };
+      // формирование блока сообщения и определение его размеров
+      var words = text.split(' ');
+      var lines = [];
+      var numberOfLine = 0;
+      words.forEach(function(element) {
+        if (this.ctx.measureText(lines[numberOfLine] + element).width < TEXT_WIDTH) {
+          lines[numberOfLine] = typeof lines[numberOfLine] === 'undefined' ? element + ' ' : lines[numberOfLine] + element + ' ';
+        } else {
+          numberOfLine++;
+          lines[numberOfLine] = element + ' ';
+        }
+      }, this);
+      // Определение высоты блока
+      var TEXT_HEIGHT = (FONT_SIZE + INTERLINE) * lines.length;
 
-      drawField(me.x, me.y, this);
+      // отрисовка поля сообщения
+      this.ctx.beginPath();
+      // отрисовка тени
+      this.ctx.shadowOffsetX = 10;
+      this.ctx.shadowOffsetY = 10;
+      this.ctx.shadowBlur = 0;
+      this.ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+      // выбор варианта отрисовки в зависимости от положения Мага
+      if (me.x < LUG + 2 * PADDING + TEXT_WIDTH && me.y > LUG + 2 * PADDING + TEXT_HEIGHT) {
+      // вариант "0"
+        var x1 = me.x + WIDTH_ME;
+        var y1 = me.y;
+        var x2 = x1 + LUG;
+        var y2 = y1 - TEXT_HEIGHT - LUG - 2 * PADDING;
+        var x3 = x2 + TEXT_WIDTH + 2 * PADDING;
+        var y3 = y2;
+        var x4 = x3;
+        var y4 = y1 - LUG;
+        var xText = x2 + PADDING;
+        var yText = y2 + FONT_SIZE;
+      } else if (me.x > LUG + 2 * PADDING + TEXT_WIDTH && me.y > LUG + 2 * PADDING + TEXT_HEIGHT) {
+        // вариант "1"
+        x1 = me.x;
+        y1 = me.y;
+        x2 = x1 - LUG;
+        y2 = y1 - TEXT_HEIGHT - LUG - 2 * PADDING;
+        x3 = x2 - TEXT_WIDTH - 2 * PADDING;
+        y3 = y2;
+        x4 = x3;
+        y4 = y1 - LUG;
+        var xText = x3 + PADDING;
+        var yText = y3 + FONT_SIZE;
+      } else if (me.x < LUG + 2 * PADDING + TEXT_WIDTH && me.y < LUG + 2 * PADDING + TEXT_HEIGHT) {
+        // вариант "2"
+        x1 = me.x + WIDTH_ME;
+        y1 = me.y + 30; // корректировка на облако
+        x2 = x1 + LUG;
+        y2 = y1 + LUG + TEXT_HEIGHT + 2 * PADDING;
+        x3 = x2 + TEXT_WIDTH + 2 * PADDING;
+        y3 = y2;
+        x4 = x3;
+        y4 = y1 + LUG;
+        var xText = x2 + PADDING;
+        var yText = y4 + FONT_SIZE;
+      } else if (me.x > LUG + 2 * PADDING + TEXT_WIDTH && me.y < LUG + 2 * PADDING + TEXT_HEIGHT) {
+        // вариант "3"
+        x1 = me.x;
+        y1 = me.y;
+        x2 = x1 - LUG;
+        y2 = y1 + LUG + TEXT_HEIGHT + 2 * PADDING;
+        x3 = x2 - TEXT_WIDTH - 2 * PADDING;
+        y3 = y2;
+        x4 = x3;
+        y4 = y1 + LUG;
+        var xText = x4 + PADDING;
+        var yText = y4 + FONT_SIZE;
+      }
 
+      this.ctx.moveTo(x1, y1);
+      this.ctx.lineTo(x2, y2);
+      this.ctx.lineTo(x3, y3);
+      this.ctx.lineTo(x4, y4);
+      this.ctx.lineTo(x1, y1);
+      this.ctx.closePath();
+      this.ctx.fillStyle = '#fff';
+      this.ctx.fill();
+      // выключение тени
+      this.ctx.shadowOffsetX = 0;
+      this.ctx.shadowOffsetY = 0;
 
+      // отрисовка текста
+      this.ctx.textBaseline = 'hanging';
+      this.ctx.fillStyle = '#000';
+      lines.forEach(function(element, index) {
+        this.ctx.fillText(element, xText, yText + (FONT_SIZE + INTERLINE) * index);
+      }, this);
 
     },
 
