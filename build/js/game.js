@@ -406,7 +406,6 @@ window.Game = (function() {
     _drawMessage: function(text) {
       var PADDING = 10;
       var TEXT_WIDTH = 200; // длина текста
-      // var TEXT_HEIGHT = 100;  // высота текста
       var FONT_SIZE = 16; // размер шрифта в px
       var FONT_NAME = 'PT Mono'; // название шрифта
       var LUG = 20;
@@ -443,55 +442,33 @@ window.Game = (function() {
       this.ctx.shadowBlur = 0;
       this.ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
       // выбор варианта отрисовки в зависимости от положения Мага
-      if (me.x < LUG + 2 * PADDING + TEXT_WIDTH && me.y > LUG + 2 * PADDING + TEXT_HEIGHT) {
-      // вариант "0"
-        var x1 = me.x + WIDTH_ME;
-        var y1 = me.y;
-        var x2 = x1 + LUG;
-        var y2 = y1 - TEXT_HEIGHT - LUG - 2 * PADDING;
-        var x3 = x2 + TEXT_WIDTH + 2 * PADDING;
-        var y3 = y2;
-        var x4 = x3;
-        var y4 = y1 - LUG;
-        var xText = x2 + PADDING;
-        var yText = y2 + FONT_SIZE;
-      } else if (me.x > LUG + 2 * PADDING + TEXT_WIDTH && me.y > LUG + 2 * PADDING + TEXT_HEIGHT) {
-        // вариант "1"
-        x1 = me.x;
-        y1 = me.y;
-        x2 = x1 - LUG;
-        y2 = y1 - TEXT_HEIGHT - LUG - 2 * PADDING;
-        x3 = x2 - TEXT_WIDTH - 2 * PADDING;
-        y3 = y2;
-        x4 = x3;
-        y4 = y1 - LUG;
-        xText = x3 + PADDING;
-        yText = y3 + FONT_SIZE;
-      } else if (me.x < LUG + 2 * PADDING + TEXT_WIDTH && me.y < LUG + 2 * PADDING + TEXT_HEIGHT) {
-        // вариант "2"
+      var xShift = LUG + 2 * PADDING + TEXT_WIDTH;
+      var yShift = LUG + 2 * PADDING + TEXT_HEIGHT;
+      var x1, x2, x3, x4, y1, y2, y3, y4, xText, yText;
+      if (me.x < xShift) {  // вариант "0" и "2"
         x1 = me.x + WIDTH_ME;
-        y1 = me.y + 30; // корректировка на облако
         x2 = x1 + LUG;
-        y2 = y1 + LUG + TEXT_HEIGHT + 2 * PADDING;
         x3 = x2 + TEXT_WIDTH + 2 * PADDING;
-        y3 = y2;
-        x4 = x3;
-        y4 = y1 + LUG;
         xText = x2 + PADDING;
-        yText = y4 + FONT_SIZE;
-      } else if (me.x > LUG + 2 * PADDING + TEXT_WIDTH && me.y < LUG + 2 * PADDING + TEXT_HEIGHT) {
-        // вариант "3"
+      } else {              // вариант "1" и "4"
         x1 = me.x;
-        y1 = me.y;
         x2 = x1 - LUG;
-        y2 = y1 + LUG + TEXT_HEIGHT + 2 * PADDING;
         x3 = x2 - TEXT_WIDTH - 2 * PADDING;
-        y3 = y2;
-        x4 = x3;
+        xText = x3 + PADDING;
+      }
+      if (me.y > yShift) {    // вариант "0" и "1"
+        y1 = me.y;
+        y2 = y1 - TEXT_HEIGHT - LUG - 2 * PADDING;
+        y4 = y1 - LUG;
+        yText = y2 + FONT_SIZE;
+      } else {                // вариант "2" и "3"
+        y1 = me.y + 30;
+        y2 = y1 + LUG + TEXT_HEIGHT + 2 * PADDING;
         y4 = y1 + LUG;
-        xText = x4 + PADDING;
         yText = y4 + FONT_SIZE;
       }
+      x4 = x3;
+      y3 = y2;
 
       this.ctx.moveTo(x1, y1);
       this.ctx.lineTo(x2, y2);
