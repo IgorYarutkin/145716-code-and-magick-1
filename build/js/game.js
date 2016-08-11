@@ -391,32 +391,19 @@ window.Game = (function() {
       }
     },
 
-    /**
-     * Отрисовка экрана паузы.
-     */
-
-/**
-*** Алгоритм отрисовки сообщения
-1. Определяются координаты головы Мага. На основании этого определяется в какую сторону будет отрисовано сообщение
-2. Определяются размеры поля и отрисовывается белое поле для сообщения и тень под ним
-3. Текст сообщения делится на отдельные строки
-4. Выводится сообщение
-***/
-
+     // Отрисовка экрана паузы
     _drawMessage: function(text) {
       var PADDING = 10;
       var TEXT_WIDTH = 200; // длина текста
       var FONT_SIZE = 16; // размер шрифта в px
       var FONT_NAME = 'PT Mono'; // название шрифта
-      var LUG = 20;
+      var LUG = 20;       // выступ для стрелочки сообщения
       var INTERLINE = 5;  // рассстояние между строчками
       var WIDTH_ME = 70;  // ширина объекта Маг
-
       // получаем объект Маг
       var me = this.state.objects.filter(function(object) {
         return object.type === ObjectType.ME;
       })[0];
-
       // формирование блока сообщения и определение его размеров
       this.ctx.font = FONT_SIZE + 'px ' + FONT_NAME;
       var words = text.split(' ');
@@ -430,10 +417,8 @@ window.Game = (function() {
           lines.push(word + ' ');
         }
       }, this);
-      // lines[numberOfLine] = (lines[numberOfLine] || '') + word + ' ';
       // Определение высоты блока
       var TEXT_HEIGHT = (FONT_SIZE + INTERLINE) * lines.length;
-
       // отрисовка поля сообщения
       this.ctx.beginPath();
       // отрисовка тени
@@ -469,7 +454,6 @@ window.Game = (function() {
       }
       x4 = x3;
       y3 = y2;
-
       this.ctx.moveTo(x1, y1);
       this.ctx.lineTo(x2, y2);
       this.ctx.lineTo(x3, y3);
@@ -481,14 +465,12 @@ window.Game = (function() {
       // выключение тени
       this.ctx.shadowOffsetX = 0;
       this.ctx.shadowOffsetY = 0;
-
       // отрисовка текста
       this.ctx.textBaseline = 'hanging';
       this.ctx.fillStyle = '#000';
       lines.forEach(function(element, index) {
         this.ctx.fillText(element, xText, yText + (FONT_SIZE + INTERLINE) * index);
       }, this);
-
     },
 
     _drawPauseScreen: function() {
