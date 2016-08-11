@@ -391,6 +391,58 @@ window.Game = (function() {
       }
     },
 
+    /**
+     * функция отрисовки поля сообщения
+     * @param {number} x1
+     * @param {number} y1
+     * @param {number} x2
+     * @param {number} y2
+     * @param {number} x3
+     * @param {number} y3
+     * @param {number} x4
+     * @param {number} y4
+     */
+    _drawPath: function(x1, y1, x2, y2, x3, y3, x4, y4) {
+      this.ctx.beginPath();
+      // отрисовка тени
+      this.ctx.shadowOffsetX = 10;
+      this.ctx.shadowOffsetY = 10;
+      this.ctx.shadowBlur = 0;
+      this.ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+      this.ctx.moveTo(x1, y1);
+      this.ctx.lineTo(x2, y2);
+      this.ctx.lineTo(x3, y3);
+      this.ctx.lineTo(x4, y4);
+      this.ctx.lineTo(x1, y1);
+      this.ctx.closePath();
+      this.ctx.fillStyle = '#fff';
+      this.ctx.fill();
+      // выключение тени
+      this.ctx.shadowOffsetX = 0;
+      this.ctx.shadowOffsetY = 0;
+    },
+
+    /**
+     * функция разбивки текста на строки
+     * @param {string} text
+     * @param {number} textWidth
+     * @return {array} lines
+     */
+    _splitText: function(text, textWidth) {
+      var words = text.split(' ');
+      var lines = [];
+      var numberOfLine = 0;
+      words.forEach(function(word) {
+        if (this.ctx.measureText(lines[numberOfLine] + word).width < textWidth) {
+          lines[numberOfLine] = (lines[numberOfLine] || '') + word + ' ';
+        } else {
+          numberOfLine++;
+          lines.push(word + ' ');
+        }
+      }, this);
+      return lines;
+    },
+
      // Отрисовка экрана паузы
     _drawMessage: function(text) {
       var PADDING = 10;
@@ -406,47 +458,31 @@ window.Game = (function() {
       })[0];
       // формирование блока сообщения и определение его размеров
       this.ctx.font = FONT_SIZE + 'px ' + FONT_NAME;
-      var words = text.split(' ');
-      var lines = [];
-      var numberOfLine = 0;
-      words.forEach(function(word) {
-        if (this.ctx.measureText(lines[numberOfLine] + word).width < TEXT_WIDTH) {
-          lines[numberOfLine] = (lines[numberOfLine] || '') + word + ' ';
-        } else {
-          numberOfLine++;
-          lines.push(word + ' ');
-        }
-      }, this);
+      var lines = this._splitText(text, TEXT_WIDTH);
       // Определение высоты блока
       var TEXT_HEIGHT = (FONT_SIZE + INTERLINE) * lines.length;
-      // отрисовка поля сообщения
-      this.ctx.beginPath();
-      // отрисовка тени
-      this.ctx.shadowOffsetX = 10;
-      this.ctx.shadowOffsetY = 10;
-      this.ctx.shadowBlur = 0;
-      this.ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+
       // выбор варианта отрисовки в зависимости от положения Мага
       var xShift = LUG + 2 * PADDING + TEXT_WIDTH;
       var yShift = LUG + 2 * PADDING + TEXT_HEIGHT;
       var x1, x2, x3, x4, y1, y2, y3, y4, xText, yText;
-      if (me.x < xShift) {  // вариант "0" и "2"
+      if (me.x < xShift) {  // Маг в правой области канваса
         x1 = me.x + WIDTH_ME;
         x2 = x1 + LUG;
         x3 = x2 + TEXT_WIDTH + 2 * PADDING;
         xText = x2 + PADDING;
-      } else {              // вариант "1" и "4"
+      } else {              // Маг в левой области канваса
         x1 = me.x;
         x2 = x1 - LUG;
         x3 = x2 - TEXT_WIDTH - 2 * PADDING;
         xText = x3 + PADDING;
       }
-      if (me.y > yShift) {    // вариант "0" и "1"
+      if (me.y > yShift) {    // Маг в нижней области канваса
         y1 = me.y;
         y2 = y1 - TEXT_HEIGHT - LUG - 2 * PADDING;
         y4 = y1 - LUG;
         yText = y2 + FONT_SIZE;
-      } else {                // вариант "2" и "3"
+      } else {                // Маг в верхней области экрана
         y1 = me.y + 30;
         y2 = y1 + LUG + TEXT_HEIGHT + 2 * PADDING;
         y4 = y1 + LUG;
@@ -454,17 +490,10 @@ window.Game = (function() {
       }
       x4 = x3;
       y3 = y2;
-      this.ctx.moveTo(x1, y1);
-      this.ctx.lineTo(x2, y2);
-      this.ctx.lineTo(x3, y3);
-      this.ctx.lineTo(x4, y4);
-      this.ctx.lineTo(x1, y1);
-      this.ctx.closePath();
-      this.ctx.fillStyle = '#fff';
-      this.ctx.fill();
-      // выключение тени
-      this.ctx.shadowOffsetX = 0;
-      this.ctx.shadowOffsetY = 0;
+
+      // отрисовка поля для текста
+      this._drawPath(x1, y1, x2, y2, x3, y3, x4, y4);
+
       // отрисовка текста
       this.ctx.textBaseline = 'hanging';
       this.ctx.fillStyle = '#000';
