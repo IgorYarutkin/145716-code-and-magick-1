@@ -482,7 +482,7 @@ window.Game = (function() {
         y2 = y1 - TEXT_HEIGHT - LUG - 2 * PADDING;
         y4 = y1 - LUG;
         yText = y2 + FONT_SIZE;
-      } else {                // Маг в верхней области экрана
+      } else {                // Маг в верхней области канваса
         y1 = me.y + 30;
         y2 = y1 + LUG + TEXT_HEIGHT + 2 * PADDING;
         y4 = y1 + LUG;
