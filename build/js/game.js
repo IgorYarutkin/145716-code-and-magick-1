@@ -392,21 +392,126 @@ window.Game = (function() {
     },
 
     /**
-     * Отрисовка экрана паузы.
+     * функция отрисовки поля сообщения
+     * @param {array} coords
      */
+    _drawPath: function(coords) {
+      this.ctx.beginPath();
+      // отрисовка тени
+      this.ctx.shadowOffsetX = 10;
+      this.ctx.shadowOffsetY = 10;
+      this.ctx.shadowBlur = 0;
+      this.ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+      this.ctx.moveTo(coords[0][0], coords[0][1]);
+      coords.forEach(function(pair) {
+        this.ctx.lineTo(pair[0], pair[1]);
+      }, this);
+      this.ctx.closePath();
+      this.ctx.fillStyle = '#fff';
+      this.ctx.fill();
+      // выключение тени
+      this.ctx.shadowOffsetX = 0;
+      this.ctx.shadowOffsetY = 0;
+    },
+
+    /**
+     * функция разбивки текста на строки
+     * @param {string} text
+     * @param {number} textWidth
+     * @return {array} lines
+     */
+    _splitText: function(text, textWidth) {
+      var words = text.split(' ');
+      var lines = [];
+      var numberOfLine = 0;
+      words.forEach(function(word) {
+        if (this.ctx.measureText(lines[numberOfLine] + word).width < textWidth) {
+          lines[numberOfLine] = (lines[numberOfLine] || '') + word + ' ';
+        } else {
+          numberOfLine++;
+          lines.push(word + ' ');
+        }
+      }, this);
+      return lines;
+    },
+
+     // Отрисовка экрана паузы
+    _drawMessage: function(text) {
+      var PADDING = 10;
+      var TEXT_WIDTH = 200; // длина текста
+      var FONT_SIZE = 16; // размер шрифта в px
+      var FONT_NAME = 'PT Mono'; // название шрифта
+      var LUG = 20;       // выступ для стрелочки сообщения
+      var INTERLINE = 5;  // рассстояние между строчками
+      var WIDTH_ME = 70;  // ширина объекта Маг
+      // получаем объект Маг
+      var me = this.state.objects.filter(function(object) {
+        return object.type === ObjectType.ME;
+      })[0];
+      // формирование блока сообщения и определение его размеров
+      this.ctx.font = FONT_SIZE + 'px ' + FONT_NAME;
+      var lines = this._splitText(text, TEXT_WIDTH);
+      // Определение высоты блока
+      var TEXT_HEIGHT = (FONT_SIZE + INTERLINE) * lines.length;
+
+      // выбор варианта отрисовки в зависимости от положения Мага
+      var xShift = LUG + 2 * PADDING + TEXT_WIDTH;
+      var yShift = LUG + 2 * PADDING + TEXT_HEIGHT;
+      var x1, x2, x3, x4, y1, y2, y3, y4, xText, yText;
+      if (me.x < xShift) {  // Маг в правой области канваса
+        x1 = me.x + WIDTH_ME;
+        x2 = x1 + LUG;
+        x3 = x2 + TEXT_WIDTH + 2 * PADDING;
+        xText = x2 + PADDING;
+      } else {              // Маг в левой области канваса
+        x1 = me.x;
+        x2 = x1 - LUG;
+        x3 = x2 - TEXT_WIDTH - 2 * PADDING;
+        xText = x3 + PADDING;
+      }
+      if (me.y > yShift) {    // Маг в нижней области канваса
+        y1 = me.y;
+        y2 = y1 - TEXT_HEIGHT - LUG - 2 * PADDING;
+        y4 = y1 - LUG;
+        yText = y2 + FONT_SIZE;
+      } else {                // Маг в верхней области канваса
+        y1 = me.y + 30;
+        y2 = y1 + LUG + TEXT_HEIGHT + 2 * PADDING;
+        y4 = y1 + LUG;
+        yText = y4 + FONT_SIZE;
+      }
+      x4 = x3;
+      y3 = y2;
+
+      // отрисовка поля для текста
+      this._drawPath([
+        [x1, y1],
+        [x2, y2],
+        [x3, y3],
+        [x4, y4]
+      ]);
+
+      // отрисовка текста
+      this.ctx.textBaseline = 'hanging';
+      this.ctx.fillStyle = '#000';
+      lines.forEach(function(element, index) {
+        this.ctx.fillText(element, xText, yText + (FONT_SIZE + INTERLINE) * index);
+      }, this);
+    },
+
     _drawPauseScreen: function() {
       switch (this.state.currentStatus) {
         case Verdict.WIN:
-          console.log('you have won!');
+          this._drawMessage('Ты победил! Поиграем снова?');
           break;
         case Verdict.FAIL:
-          console.log('you have failed!');
+          this._drawMessage('Ты проиграл! Попробуй еще раз!');
           break;
         case Verdict.PAUSE:
-          console.log('game is on pause!');
+          this._drawMessage('Игра поставлена на паузу');
           break;
         case Verdict.INTRO:
-          console.log('welcome to the game! Press Space to start');
+          this._drawMessage('Я умею ходить и летать по нажатию на стрелочки. А если нажать SHIFT, то я выстрелю файерболом');
           break;
       }
     },
