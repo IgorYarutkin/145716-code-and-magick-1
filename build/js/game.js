@@ -403,10 +403,9 @@ window.Game = (function() {
       this.ctx.shadowBlur = 0;
       this.ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
       this.ctx.moveTo(coords[0][0], coords[0][1]);
-      this.ctx.lineTo(coords[1][0], coords[1][1]);
-      this.ctx.lineTo(coords[2][0], coords[2][1]);
-      this.ctx.lineTo(coords[3][0], coords[3][1]);
-      this.ctx.lineTo(coords[0][0], coords[0][1]);
+      coords.forEach(function(pair) {
+        this.ctx.lineTo(pair[0], pair[1]);
+      }, this);
       this.ctx.closePath();
       this.ctx.fillStyle = '#fff';
       this.ctx.fill();
@@ -483,10 +482,14 @@ window.Game = (function() {
       }
       x4 = x3;
       y3 = y2;
-      var coordinates = [[x1, y1], [x2, y2], [x3, y3], [x4, y4]];
 
       // отрисовка поля для текста
-      this._drawPath(coordinates);
+      this._drawPath([
+        [x1, y1],
+        [x2, y2],
+        [x3, y3],
+        [x4, y4]
+      ]);
 
       // отрисовка текста
       this.ctx.textBaseline = 'hanging';
