@@ -393,27 +393,20 @@ window.Game = (function() {
 
     /**
      * функция отрисовки поля сообщения
-     * @param {number} x1
-     * @param {number} y1
-     * @param {number} x2
-     * @param {number} y2
-     * @param {number} x3
-     * @param {number} y3
-     * @param {number} x4
-     * @param {number} y4
+     * @param {array} coords
      */
-    _drawPath: function(x1, y1, x2, y2, x3, y3, x4, y4) {
+    _drawPath: function(coords) {
       this.ctx.beginPath();
       // отрисовка тени
       this.ctx.shadowOffsetX = 10;
       this.ctx.shadowOffsetY = 10;
       this.ctx.shadowBlur = 0;
       this.ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-      this.ctx.moveTo(x1, y1);
-      this.ctx.lineTo(x2, y2);
-      this.ctx.lineTo(x3, y3);
-      this.ctx.lineTo(x4, y4);
-      this.ctx.lineTo(x1, y1);
+      this.ctx.moveTo(coords[0][0], coords[0][1]);
+      this.ctx.lineTo(coords[1][0], coords[1][1]);
+      this.ctx.lineTo(coords[2][0], coords[2][1]);
+      this.ctx.lineTo(coords[3][0], coords[3][1]);
+      this.ctx.lineTo(coords[0][0], coords[0][1]);
       this.ctx.closePath();
       this.ctx.fillStyle = '#fff';
       this.ctx.fill();
@@ -490,9 +483,10 @@ window.Game = (function() {
       }
       x4 = x3;
       y3 = y2;
+      var coordinates = [[x1, y1], [x2, y2], [x3, y3], [x4, y4]];
 
       // отрисовка поля для текста
-      this._drawPath(x1, y1, x2, y2, x3, y3, x4, y4);
+      this._drawPath(coordinates);
 
       // отрисовка текста
       this.ctx.textBaseline = 'hanging';
