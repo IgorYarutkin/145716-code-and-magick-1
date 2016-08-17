@@ -436,9 +436,8 @@ window.Game = (function() {
     },
 
      // Отрисовка экрана паузы
-    _drawMessage: function(text) {
+    _drawMessage: function(text, width) {
       var PADDING = 10;
-      var TEXT_WIDTH = 200; // длина текста
       var FONT_SIZE = 16; // размер шрифта в px
       var FONT_NAME = 'PT Mono'; // название шрифта
       var LUG = 20;       // выступ для стрелочки сообщения
@@ -450,23 +449,23 @@ window.Game = (function() {
       })[0];
       // формирование блока сообщения и определение его размеров
       this.ctx.font = FONT_SIZE + 'px ' + FONT_NAME;
-      var lines = this._splitText(text, TEXT_WIDTH);
+      var lines = this._splitText(text, width);
       // Определение высоты блока
       var TEXT_HEIGHT = (FONT_SIZE + INTERLINE) * lines.length;
 
       // выбор варианта отрисовки в зависимости от положения Мага
-      var xShift = LUG + 2 * PADDING + TEXT_WIDTH;
+      var xShift = LUG + 2 * PADDING + width;
       var yShift = LUG + 2 * PADDING + TEXT_HEIGHT;
       var x1, x2, x3, x4, y1, y2, y3, y4, xText, yText;
       if (me.x < xShift) {  // Маг в правой области канваса
         x1 = me.x + WIDTH_ME;
         x2 = x1 + LUG;
-        x3 = x2 + TEXT_WIDTH + 2 * PADDING;
+        x3 = x2 + width + 2 * PADDING;
         xText = x2 + PADDING;
       } else {              // Маг в левой области канваса
         x1 = me.x;
         x2 = x1 - LUG;
-        x3 = x2 - TEXT_WIDTH - 2 * PADDING;
+        x3 = x2 - width - 2 * PADDING;
         xText = x3 + PADDING;
       }
       if (me.y > yShift) {    // Маг в нижней области канваса
@@ -502,16 +501,16 @@ window.Game = (function() {
     _drawPauseScreen: function() {
       switch (this.state.currentStatus) {
         case Verdict.WIN:
-          this._drawMessage('Ты победил! Поиграем снова?');
+          this._drawMessage('Ты победил! Поиграем снова?', 200);
           break;
         case Verdict.FAIL:
-          this._drawMessage('Ты проиграл! Попробуй еще раз!');
+          this._drawMessage('Ты проиграл! Попробуй еще раз!', 200);
           break;
         case Verdict.PAUSE:
-          this._drawMessage('Игра поставлена на паузу');
+          this._drawMessage('Игра поставлена на паузу', 200);
           break;
         case Verdict.INTRO:
-          this._drawMessage('Я умею ходить и летать по нажатию на стрелочки. А если нажать SHIFT, то я выстрелю файерболом');
+          this._drawMessage('Я умею ходить и летать по нажатию на стрелочки. А если нажать SHIFT, то я выстрелю файерболом', 200);
           break;
       }
     },
