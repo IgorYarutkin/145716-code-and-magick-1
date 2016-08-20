@@ -3,12 +3,11 @@
 window.form = (function() {
   var formContainer = document.querySelector('.overlay-container');
   var formCloseButton = document.querySelector('.review-form-close');
-  var formSubmitButton = document.querySelector('.review-submit');
-  var reviewLabelsGroup = document.querySelector('.review-fields');
-  var reviewLabelName = document.querySelector('.review-fields-name');
-  var reviewLabelText = document.querySelector('.review-fields-text');
-  var reviewInputName = document.querySelector('.review-form-field-name');
-  var reviewInputText = document.querySelector('.review-form-field-text');
+  var newReviewForm = document.querySelector('.review-form');
+  var reviewLabelsGroup = newReviewForm.querySelector('.review-fields');
+  var reviewLabelName = newReviewForm.querySelector('.review-fields-name');
+  var reviewLabelText = newReviewForm.querySelector('.review-fields-text');
+  var formSubmitButton = newReviewForm.querySelector('.review-submit');
 
   var form = {
     onClose: null,
@@ -16,28 +15,15 @@ window.form = (function() {
     /** Функция проверки заполнения полей
      * @param {event} evt;
      */
-    checkField: function(evt) {
-      if (evt.target === reviewInputName || evt.target === reviewInputText) {
-        if (evt.target.value === '') {
-          if (evt.target === reviewInputName) {
-            reviewLabelName.classList.remove('invisible');
-          } else {
-            reviewLabelText.classList.remove('invisible');
-          }
-        } else {
-          if (evt.target === reviewInputName) {
-            reviewLabelName.classList.add('invisible');
-          } else {
-            reviewLabelText.classList.add('invisible');
-          }
-        }
-        if (reviewLabelName.classList.contains('invisible') && reviewLabelText.classList.contains('invisible')) {
-          reviewLabelsGroup.classList.add('invisible');
-          formSubmitButton.removeAttribute('disabled', 'disabled');
-        } else {
-          reviewLabelsGroup.classList.remove('invisible');
-        }
-      }
+    checkField: function() {
+      var nameIsValid = newReviewForm.elements['review-name'].value !== '';
+      var textIsValid = newReviewForm.elements['review-mark'].value >= 3 || newReviewForm.elements['review-text'].value !== '';
+      var reviewIsValid = nameIsValid && textIsValid;
+
+      reviewLabelName.classList.toggle('invisible', nameIsValid);
+      reviewLabelText.classList.toggle('invisible', textIsValid);
+      reviewLabelsGroup.classList.toggle('invisible', reviewIsValid);
+      formSubmitButton.disabled = !reviewIsValid;
     },
 
     /**
@@ -45,9 +31,10 @@ window.form = (function() {
      */
     open: function(cb) {
       formContainer.classList.remove('invisible');
-      formSubmitButton.setAttribute('disabled', 'disabled');
+      this.checkField();
       cb();
-      formContainer.addEventListener('input', this.checkField);
+      newReviewForm.addEventListener('input', this.checkField);
+      newReviewForm.addEventListener('change', this.checkField);
     },
 
     close: function() {
