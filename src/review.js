@@ -1,5 +1,7 @@
 'use strict';
 
+var loadImage = require('./load-image');
+
 var reviewTemplate = document.getElementById('review-template');
 var elementToClone;
 if ('content' in reviewTemplate) {
@@ -7,39 +9,69 @@ if ('content' in reviewTemplate) {
 } else {
   elementToClone = reviewTemplate.querySelector('.review');
 }
-var reviewRatingRate = ['review-rating-two', 'review-rating-three', 'review-rating-four', 'review-rating-five'];
-
-var TIME_OUT = 10000;
 
 /**
- * getReviewElement - функция получения html-элемента, сгенерированного
- * по данным загруженного списка
- * @param {array} data
+ * Creates a new html-element review.
+ * @class
+ * @param {object} data
  */
-function getReviewElement(data) {
+var Review = function(data) {
+  this.data = data;
+  this.element = elementToClone.cloneNode(true);
+  this.element.querySelector('.review-text').textContent = data.description;
+  this.element.querySelector('.review-rating').classList.add(this.getRatingClass());
 
-  var review = elementToClone.cloneNode(true);
-  review.querySelector('.review-text').textContent = data.description;
-  if(data.rating >= 2) {
-    review.querySelector('.review-rating').classList.add(reviewRatingRate[data.rating - 2]);
+  var ctx = this;
+
+  this.quizYes = this.element.querySelector('.review-quiz-answer-yes');
+  this.quizNo = this.element.querySelector('.review-quiz-answer-no');
+
+  this.quizYes.onclick = function() {
+    ctx.setUsefull(true);
+  };
+  this.quizNo.onclick = function() {
+    ctx.setUsefull(false);
+  };
+
+  loadImage(data.author.picture, this.onImageLoad.bind(this));
+};
+
+/**
+ * Коллбек для загрузки изображений
+ * @param {boolean} isOk
+ */
+Review.prototype.onImageLoad = function(isOk) {
+  if (isOk) {
+    this.element.querySelector('.review-author').src = this.data.author.picture;
+  } else {
+    this.element.classList.add('review-load-failure');
   }
+};
 
-  var dummyImage = new Image();
-  var imageLoadTimeout;
-  dummyImage.onload = function() {
-    clearTimeout(imageLoadTimeout);
-    review.querySelector('.review-author').src = data.author.picture;
-  };
-  dummyImage.onerror = function() {
-    review.classList.add('review-load-failure');
-  };
-  dummyImage.src = data.author.picture;
-  imageLoadTimeout = setTimeout(function() {
-    dummyImage.src = '';
-    review.classList.add('review-load-failure');
-  }, TIME_OUT);
+Review.prototype.reviewRatingRate = [
+  'review-rating-one',
+  'review-rating-two',
+  'review-rating-three',
+  'review-rating-four',
+  'review-rating-five'
+];
 
-  return review;
-}
+/**
+ * Возвращает класс рейтинга отзыва
+ * @return {string}
+ */
+Review.prototype.getRatingClass = function() {
+  return this.reviewRatingRate[this.data.rating - 1];
+};
 
-module.exports = getReviewElement;
+Review.prototype.setUsefull = function(yes) {
+  this.quizYes.classList.toggle('review-quiz-answer-active', yes);
+  this.quizNo.classList.toggle('review-quiz-answer-active', !yes);
+};
+
+Review.prototype.remove = function() {
+  this.quizYes.onclick = null;
+  this.quizNo.onclick = null;
+};
+
+module.exports = Review;

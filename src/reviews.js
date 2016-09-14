@@ -1,6 +1,6 @@
 'use strict';
 
-var getReviewElement = require('./review');
+var Review = require('./review');
 var load = require('./load');
 
 var reviews = [];
@@ -13,8 +13,9 @@ function showReviews() {
 
   load('http://localhost:1506/api/reviews', function(reviewsData) {
     reviews = reviewsData;
-    reviews.forEach(function(review) {
-      reviewsList.appendChild(getReviewElement(review, reviewsList));
+    reviews.forEach(function(reviewData) {
+      var review = new Review(reviewData);
+      reviewsList.appendChild(review.element);
     });
     reviewsFilter.classList.remove('invisible');
   });
