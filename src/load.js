@@ -4,12 +4,13 @@
  * getCallbackName - функция для получения бесконечного числа
  * имен с использованием индекса на замыкании
  *
+ * param {stirng} partName постоянная часть имени
  * @return {string} сгенеррированное имя функции
  */
 var getCallbackName = (function() {
   var index = 0;
-  return function() {
-    return 'jsonp_callback_' + index++;
+  return function(partName) {
+    return partName + index++;
   };
 })();
 
@@ -20,7 +21,7 @@ var getCallbackName = (function() {
  */
 function callJsonp(url, callback) {
 
-  var callbackName = getCallbackName();
+  var callbackName = getCallbackName('jsonp_callback_');
 
   window[callbackName] = function(data) {
     callback(data);
