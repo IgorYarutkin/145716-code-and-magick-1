@@ -1,37 +1,30 @@
 'use strict';
 
 /**
- * getCallbackName - функция для получения бесконечного числа
- * имен с использованием индекса на замыкании
- *
- * param {stirng} partName постоянная часть имени
- * @return {string} сгенеррированное имя функции
+ * loadJson - функция получения списка отзывов по XMLHttpRequest
+ * @param {string} url        // строка с адресом запроса
+ * @param {object} params     // объект с параметрами запроса (from, to, filter)
+ * @param {function} callback // функция-колбэк, которая вызывается при успешной загрузке
  */
-var getCallbackName = (function() {
-  var index = 0;
-  return function(partName) {
-    return partName + index++;
+function loadJson(url, params, callback) {
+
+  url = url + '?from=' + params.from + '&to=' + params.to + '&filter=' + params.filter;
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url);
+  xhr.onload = function(evt) {
+    console.log('Успешная загрузка!');
+    callback(JSON.parse(evt.target.response));
   };
-})();
-
-/**
- * callJsonp - функция получения списка отзывов по JSONP
- * @param {string} url
- * @param {function} callback
- */
-function callJsonp(url, callback) {
-
-  var callbackName = getCallbackName('jsonp_callback_');
-
-  window[callbackName] = function(data) {
-    callback(data);
-    document.body.removeChild(callbackScript);
-    delete window[callbackName];
+  xhr.onerror = function(evt) {
+    console.warn('Что-то пошло не так! Статус ответа:' + evt.status);
+  };
+  xhr.timeout = 10000;
+  xhr.ontimeout = function() {
+    console.warn('Нет ответа от сервера. Проверьте подключение к Интернету');
   };
 
-  var callbackScript = document.createElement('script');
-  callbackScript.src = url + '?callback=' + callbackName;
-  document.body.appendChild(callbackScript);
+  xhr.send();
 }
 
-module.exports = callJsonp;
+module.exports = loadJson;

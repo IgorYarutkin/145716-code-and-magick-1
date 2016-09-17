@@ -20,6 +20,9 @@ var Review = function(data) {
   this.element = elementToClone.cloneNode(true);
   this.element.querySelector('.review-text').textContent = data.description;
   this.element.querySelector('.review-rating').classList.add(this.getRatingClass());
+  var date = new Date(data.created);
+  this.element.querySelector('.review-date').textContent = date.toLocaleString();
+  this.element.querySelector('.review-usefulness').textContent = data.review_usefulness;
 
   var ctx = this;
 
