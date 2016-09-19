@@ -253,7 +253,8 @@ var Game = function(container) {
   this._onKeyDown = this._onKeyDown.bind(this);
   this._onKeyUp = this._onKeyUp.bind(this);
   this._pauseListener = this._pauseListener.bind(this);
-
+  this._gameIsOnView = this._gameIsOnView.bind(this);
+  this._clouds = this._clouds.bind(this);
   this.setDeactivated(false);
 };
 
@@ -782,16 +783,48 @@ Game.prototype = {
     }
   },
 
+  lastTime: 0,
+  shouldMoveClouds: true,
+
+  /**
+   * Функция проверки видимости игры
+   */
+  _gameIsOnView: function() {
+    var currentTime = new Date();
+    if ((currentTime - this.lastTime) > 100) {
+      var gameBlock = document.querySelector('.demo');
+      var gameBlockBottom = gameBlock.getBoundingClientRect().bottom;
+      if (gameBlockBottom < 0 ) {
+        this.setGameStatus(Game.Verdict.PAUSE);
+        this.shouldMoveClouds = false;
+      } else {
+        this.shouldMoveClouds = true;
+      }
+      this.lastTime = currentTime;
+    }
+  },
+
+  _clouds: function() {
+    if (this.shouldMoveClouds) {
+      var clouds = document.querySelector('.header-clouds');
+      clouds.style.backgroundPositionX = -window.pageYOffset + 'px';
+    }
+  },
+
   /** @private */
   _initializeGameListeners: function() {
     window.addEventListener('keydown', this._onKeyDown);
     window.addEventListener('keyup', this._onKeyUp);
+    window.addEventListener('scroll', this._gameIsOnView);
+    window.addEventListener('scroll', this._clouds);
   },
 
   /** @private */
   _removeGameListeners: function() {
     window.removeEventListener('keydown', this._onKeyDown);
     window.removeEventListener('keyup', this._onKeyUp);
+    window.removeEventListener('scroll', this._gameIsOnView);
+    window.removeEventListener('scroll', this._clouds);
   }
 };
 
