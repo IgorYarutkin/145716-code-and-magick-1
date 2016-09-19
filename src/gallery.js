@@ -37,18 +37,17 @@ Gallery.prototype._slideToRight = function() {
 };
 
 Gallery.prototype._hide = function() {
-  this.arrowLeft.onclick = null;
-  this.arrowRight.onclick = null;
-  this.galleryClose.onclick = null;
+  this.arrowLeft.removeEventListener('click', this._slideToLeft);
+  this.arrowRight.removeEventListener('click', this._slideToRight);
+  this.galleryClose.removeEventListener('click', this._hide);
   this.gallery.classList.add('invisible');
 };
 
 Gallery.prototype.show = function(number) {
-  var that = this;
-  // добавление обработчиков
-  this.arrowLeft.onclick = that._slideToLeft;
-  this.arrowRight.onclick = that._slideToRight;
-  this.galleryClose.onclick = that._hide;
+
+  this.arrowLeft.addEventListener('click', this._slideToLeft);
+  this.arrowRight.addEventListener('click', this._slideToRight);
+  this.galleryClose.addEventListener('click', this._hide);
 
   this.gallery.classList.remove('invisible');
   this._setActivePicture(number);
