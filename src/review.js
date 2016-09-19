@@ -24,17 +24,13 @@ var Review = function(data) {
   this.element.querySelector('.review-date').textContent = date.toLocaleString();
   this.element.querySelector('.review-usefulness').textContent = data.review_usefulness;
 
-  var ctx = this;
+  this.setUsefull = this.setUsefull.bind(this);
 
   this.quizYes = this.element.querySelector('.review-quiz-answer-yes');
   this.quizNo = this.element.querySelector('.review-quiz-answer-no');
 
-  this.quizYes.onclick = function() {
-    ctx.setUsefull(true);
-  };
-  this.quizNo.onclick = function() {
-    ctx.setUsefull(false);
-  };
+  this.quizYes.addEventListener('click', this.setUsefull);
+  this.quizNo.addEventListener('click', this.setUsefull);
 
   loadImage(data.author.picture, this.onImageLoad.bind(this));
 };
@@ -67,7 +63,9 @@ Review.prototype.getRatingClass = function() {
   return this.reviewRatingRate[this.data.rating - 1];
 };
 
-Review.prototype.setUsefull = function(yes) {
+Review.prototype.setUsefull = function(evt) {
+  var yes = evt.target === this.quizYes;
+  console.log(yes);
   this.quizYes.classList.toggle('review-quiz-answer-active', yes);
   this.quizNo.classList.toggle('review-quiz-answer-active', !yes);
 };
