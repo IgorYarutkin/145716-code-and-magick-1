@@ -16,7 +16,8 @@ function showReviews() {
 
   var pageNumber = 0;
   var pageSize = 3;
-  var filterID = 'reviews-all';
+  var filterID = localStorage.getItem('filter') || 'reviews-all';
+  reviewsFilter.querySelector('#' + filterID).checked = true;
 
   /**
    * Функция отрисовки блока отзывов
@@ -51,6 +52,7 @@ function showReviews() {
     reviewsList.innerHTML = '';
     pageNumber = 0;
     filterID = evt.target.value;
+    localStorage.setItem('filter', filterID);
     addMoreReviews();
   };
 
