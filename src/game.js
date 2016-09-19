@@ -237,6 +237,8 @@ LevelsInitialize[Level.INTRO] = function(state) {
   return state;
 };
 
+var throttle = require('./throttle.js');
+
 /**
  * Конструктор объекта Game. Создает canvas, добавляет обработчики событий
  * и показывает приветственный экран.
@@ -253,7 +255,7 @@ var Game = function(container) {
   this._onKeyDown = this._onKeyDown.bind(this);
   this._onKeyUp = this._onKeyUp.bind(this);
   this._pauseListener = this._pauseListener.bind(this);
-  this._gameIsOnView = this._gameIsOnView.bind(this);
+  this._gameIsOnView = throttle(this._gameIsOnView.bind(this), 100);
   this._clouds = this._clouds.bind(this);
   this.setDeactivated(false);
 };
@@ -783,24 +785,19 @@ Game.prototype = {
     }
   },
 
-  lastTime: 0,
   shouldMoveClouds: true,
 
   /**
    * Функция проверки видимости игры
    */
   _gameIsOnView: function() {
-    var currentTime = new Date();
-    if ((currentTime - this.lastTime) > 100) {
-      var gameBlock = document.querySelector('.demo');
-      var gameBlockBottom = gameBlock.getBoundingClientRect().bottom;
-      if (gameBlockBottom < 0 ) {
-        this.setGameStatus(Game.Verdict.PAUSE);
-        this.shouldMoveClouds = false;
-      } else {
-        this.shouldMoveClouds = true;
-      }
-      this.lastTime = currentTime;
+    var gameBlock = document.querySelector('.demo');
+    var gameBlockBottom = gameBlock.getBoundingClientRect().bottom;
+    if (gameBlockBottom < 0 ) {
+      this.setGameStatus(Game.Verdict.PAUSE);
+      this.shouldMoveClouds = false;
+    } else {
+      this.shouldMoveClouds = true;
     }
   },
 
@@ -823,8 +820,6 @@ Game.prototype = {
   _removeGameListeners: function() {
     window.removeEventListener('keydown', this._onKeyDown);
     window.removeEventListener('keyup', this._onKeyUp);
-    window.removeEventListener('scroll', this._gameIsOnView);
-    window.removeEventListener('scroll', this._clouds);
   }
 };
 
